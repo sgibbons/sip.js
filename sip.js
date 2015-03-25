@@ -1240,7 +1240,7 @@ function sequentialSearch(transaction, connect, addresses, rq, callback) {
   next();
 }
 
-exports.create = function(options, callback) {
+exports.create = function(options, callback, responseHandler) {
   var errorLog = (options.logger && options.logger.error) || function() {};
 
   var transport = makeTransport(options, function(m,remote) {
@@ -1262,7 +1262,9 @@ exports.create = function(options, callback) {
         }
       }
       else {
-        t.message && t.message(m, remote);
+				responseHandler(m, remote, function(m, remote) {
+					t.message && t.message(m, remote);
+				});
       }
     } 
     catch(e) {
@@ -1362,8 +1364,8 @@ exports.create = function(options, callback) {
   } 
 }
 
-exports.start = function(options, callback) {
-  var r = exports.create(options, callback);
+exports.start = function(options, callback, responseHandler) {
+  var r = exports.create(options, callback, responseHandler);
 
   exports.send = r.send;
   exports.stop = r.destroy;
